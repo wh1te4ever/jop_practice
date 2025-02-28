@@ -109,6 +109,10 @@ uint32_t my_call6(uint64_t addr, uint64_t a1, uint64_t a2, uint64_t a3, uint64_t
     uint32_t ret = 0;
 
     //TODO: call my_call8 using addr
+    uint64_t (*func)(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t) = 
+        (uint64_t (*)(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t)) addr;
+
+    ret = (uint32_t)func(a1, a2, a3, a4, a5, a6, a7, 0);
 
     return ret;
 }
