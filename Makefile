@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -Wall -Wextra -O2 -Weverything -Wno-int-conversion
+CFLAGS = -Wall -Wextra -O0 -Weverything -Wno-int-conversion -Wno-implicit-function-declaration
 LDFLAGS = -framework IOKit -framework CoreFoundation 
 
 TARGET = main
