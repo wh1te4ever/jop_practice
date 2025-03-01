@@ -50,91 +50,11 @@ __attribute__((naked)) void mov_x15_x2__br_x3(void) {
     );
 }
 
-//FFFFFFF00874CF28
-__attribute__((naked)) void mov_x9_x15__br_x16(void) {
-    __asm__ volatile (
-        "mov x9, x15\n"
-        "br x16\n"
-    );
-}
-
-//FFFFFFF008A01918
-__attribute__((naked)) void mov_x1_x2__br_x3(void) {
-    __asm__ volatile (
-        "mov x1, x2\n"
-        "br x3\n"
-    );
-}
-
-//FFFFFFF008E43614
-__attribute__((naked)) void mov_x4_x8__br_x10(void) {
-    __asm__ volatile (
-        "mov x4, x8\n"
-        "br x10\n"
-    );
-}
-
-//mov x16, x1 ; br x2
-__attribute__((naked)) void mov_x16_x1__br_x2(void) {
-    __asm__ volatile (
-        "mov x16, x1\n"
-        "br x2\n"
-    );
-}
-
-//mov x2, x8 ; br x3
-__attribute__((naked)) void mov_x2_x8__br_x3(void) {
-    __asm__ volatile (
-        "mov x2, x8\n"
-        "br x3\n"
-    );
-}
-
-//mov x16, x14 ; br x3
-__attribute__((naked)) void mov_x16_x14__br_x3(void) {
-    __asm__ volatile (
-        "mov x16, x14\n"
-        "br x3\n"
-    );
-}
-
-//mov x14, x3 ; br x4
-__attribute__((naked)) void mov_x14_x3__br_x4(void) {
-    __asm__ volatile (
-        "mov x14, x3\n"
-        "br x4\n"
-    );
-}
-
-//mov x16, x11 ; br x3
-__attribute__((naked)) void mov_x16_x11__br_x3(void) {
-    __asm__ volatile (
-        "mov x16, x11\n"
-        "br x3\n"
-    );
-}
-
-//mov x14, x11 ; br x15
-__attribute__((naked)) void mov_x14_x11__br_x15(void) {
-    __asm__ volatile (
-        "mov x14, x11\n"
-        "br x15\n"
-    );
-}
-
 //FFFFFFF0088191C0
 //mov x10, x0 ; br x2
 __attribute__((naked)) void mov_x10_x0__br_x2(void) {
     __asm__ volatile (
         "mov x10, x0\n"
-        "br x2\n"
-    );
-}
-
-//mov x14, x1 ; br x2
-__attribute__((naked)) void mov_x14_x1__br_x2(void) {
-    __asm__ volatile (
-        "mov x14, x1\n"
         "br x2\n"
     );
 }
@@ -171,31 +91,6 @@ __attribute__((naked)) void mov_x7_x16__br_x10(void) {
 __attribute__((naked)) void mov_x10_x0__br_x12(void) {
     __asm__ volatile (
         "mov x10, x0\n"
-        "br x12\n"
-    );
-}
-
-//mov x8, x10 ; br x12
-__attribute__((naked)) void mov_x8_x10__br_x12(void) {
-    __asm__ volatile (
-        "mov x8, x10\n"
-        "br x12\n"
-    );
-}
-
-//mov x11, x10 ; br x12
-__attribute__((naked)) void mov_x11_x10__br_x12(void) {
-    __asm__ volatile (
-        "mov x11, x10\n"
-        "br x12\n"
-    );
-}
-
-
-//mov x13, x14 ; br x12
-__attribute__((naked)) void mov_x13_x14__br_x12(void) {
-    __asm__ volatile (
-        "mov x13, x14\n"
         "br x12\n"
     );
 }
